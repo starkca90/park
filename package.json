@@ -2,7 +2,7 @@
   "name": "park",
   "version": "1.0.0",
   "description": "Server code for parking validation",
-  "main": "bin/wwww.js",
+  "main": "bin/www.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" "
   },

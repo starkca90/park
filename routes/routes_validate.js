@@ -7,11 +7,11 @@ const parkonectErrors = require('../api-v1/services/parkonect/parkonectErrors')
 const router = express.Router()
 
 router.get('/', (req, res) => {
-
     const session_cookie_value = utils_cookie.parseSessionCookie(req.headers.cookie)
 
     if (session_cookie_value) {
         parkonect.attemptSessionRefresh(session_cookie_value).then(r => {
+            console.log(r)
             if (r.result) {
                 res.render('search', {
                     title_description: 'Search',
@@ -38,19 +38,19 @@ router.post('/',
         if (errors.isEmpty()) {
 
 
-            parkonect.ticketSearch(req.body.ticket, req.body.viewstate, req.body.eventvalidation, req.body.session_cookie).then(r => {
+            parkonect.ticketValidate(req.body.validation_code, req.body.viewstate, req.body.eventvalidation, req.body.session_cookie).then(r => {
                 if (r.result) {
                     // A result was found
-                    res.render('validate', {
-                        title_description: 'Validate',
-                        message: r.check_in,
+                    res.render('result', {
+                        title_description: 'Success',
+                        message: 'Record updated successfully!',
                         data: r
                     })
                 } else {
-                    // Ticket was not found
-                    res.render('search', {
-                        title_description: 'Search',
-                        message: 'The barcode entered was not found\r\nPlease try again.',
+                    // Error encountered validating
+                    res.render('result', {
+                        title_description: 'Failed',
+                        message: r.message,
                         data: r
                     })
                 }
@@ -59,10 +59,10 @@ router.post('/',
                 res.send(err.data.message)
             })
         } else
-            res.render('authentication',
+            res.render('search',
                 {
-                    title_description: 'Authentication',
-                    errors: errors.array(),
+                    title_description: 'Search',
+                    errors: 'An error was encountered. Please try again',
                     data: req.body
                 })
     })

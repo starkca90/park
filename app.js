@@ -23,6 +23,7 @@ app.use(cookieParser());
 app.use(express.static('public'))
 app.use('/', require('./routes/routes_root'))
 app.use('/search', require('./routes/routes_search'))
+app.use('/validate', require('./routes/routes_validate'))
 
 // OpenAPI Routes
 initialize({

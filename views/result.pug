@@ -1,0 +1,26 @@
+extends base
+
+block content
+    -data = data || {}
+
+    script(
+        src='js/autoclick.js'
+    )
+
+    if (message)
+        if (!data.result)
+            span(style='color:Red') #{message}
+        else
+            span(style='color:Red') #{message}
+
+    p(id="redirect")
+
+    form(action="/search" method="GET" class="form-floating")
+        h1 Parkonect
+
+        input(type="hidden" name="viewstate" id="viewstate" value=data.viewstate)
+        input(type="hidden" name="eventvalidation" id="eventvalidation" value=data.eventvalidation)
+        input(type="hidden" name="session_cookie" id="session_cookie" value=data.session_cookie)
+
+        div(class="form-floating")
+            input(type="submit" value="Submit" class="btn btn-lg btn-primary btn-block")

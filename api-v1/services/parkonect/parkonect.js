@@ -6,6 +6,43 @@ const ParkonectErrors = require('./parkonectErrors')
 const utils_cookie = require('../cookie/cookie')
 
 module.exports = {
+    attemptSessionRefresh: async function (session_cookie) {
+        const jar = new tough.CookieJar()
+        const client = wrapper(axios.create({jar}))
+
+        // Add the provided session cookie to the cookie jar
+        const cookie = tough.Cookie.parse(`${utils_cookie.getSessionCookieKey()}=${session_cookie}; Domain=secure.parkonect.com; path=/;`)
+        jar.setCookie(cookie, 'https://secure.parkonect.com')
+
+        let viewstate, eventvalidation
+
+        // This is a new session, get a new set of session tokens
+        let response = await client.get('https://secure.parkonect.com/ValidatorStep2.aspx')
+            .catch(function (error) {
+                throw new ParkonectErrors.ParkonectError(error)
+            })
+
+        // Other session/state tokens are in the form itself, parse the returned body to find our required values
+        let validatorForm = HTMLParser.parse(response.data).querySelector('form')
+
+        if (!validatorForm)
+            throw new ParkonectErrors.ParkonectError(response, 'Authentication Form Not Found')
+
+        // If we authenticated, the form will be asking for a barcode. If that input is present,
+        // authentication worked
+        const result = validatorForm.querySelector('#ctl00_cph_body_txt_barcode') !== null
+
+        viewstate = validatorForm.querySelector('#__VIEWSTATE').getAttribute('value')
+        eventvalidation = validatorForm.querySelector('#__EVENTVALIDATION').getAttribute('value')
+
+        return {
+            'result': result,
+            'viewstate': viewstate,
+            'eventvalidation': eventvalidation,
+            'session_cookie': session_cookie
+        }
+    },
+
     attemptAuth: async function (username, password, remember = false) {
         const jar = new tough.CookieJar()
         const client = wrapper(axios.create({jar}))
@@ -119,15 +156,82 @@ module.exports = {
         // If we found a valid ticket, we shouldn't be asking for a barcode
         const result = validatorForm.querySelector('#ctl00_cph_body_txt_barcode') === null
 
-        // TODO: Need a fresh ticket to see what that response looks like
+        const check_in_message = validatorForm.querySelector('#ctl00_cph_body_lbl_message').text
+
+        let codes = []
+
+        if (result) {
+            const options = validatorForm.querySelector('#ctl00_cph_body_ddl_validations').getElementsByTagName('option')
+
+            options.forEach(option => {
+                let code = {}
+                code.value = option.getAttribute('value')
+                code.description = option.text
+                codes.push(code)
+            })
+        }
+
+        // Grab the next set of state tokens
+        viewstate = validatorForm.querySelector('#__VIEWSTATE').getAttribute('value')
+        eventvalidation = validatorForm.querySelector('#__EVENTVALIDATION').getAttribute('value')
 
         return {
             'result': result,
-            'codes': 'TODO',
+            'check_in': check_in_message,
+            'codes': codes,
             'viewstate': viewstate,
             'eventvalidation': eventvalidation,
             'session_cookie': session_cookie
         }
 
+    },
+
+    ticketValidate: async function (validation, viewstate, eventvalidation, session_cookie) {
+        const jar = new tough.CookieJar()
+        const client = wrapper(axios.create({jar}))
+
+        // Add the provided session cookie to the cookie jar
+        const cookie = tough.Cookie.parse(`${utils_cookie.getSessionCookieKey()}=${session_cookie}; Domain=secure.parkonect.com; path=/;`)
+        jar.setCookie(cookie, 'https://secure.parkonect.com')
+
+        // Build the search body
+        const body = new URLSearchParams()
+        body.append('__VIEWSTATE', viewstate)
+        // From testing, this parameter is always empty, but if it is not included, the server breaks
+        body.append('__VIEWSTATEENCRYPTED', null)
+        body.append('__EVENTVALIDATION', eventvalidation)
+        body.append('ctl00$cph_body$ddl_validations', validation)
+        body.append('ctl00$cph_body$btn_submit', 'Submit')
+
+        let response = await client.post('https://secure.parkonect.com/ValidatorStep2.aspx', body,
+            {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            })
+            .catch(function (error) {
+                throw new ParkonectErrors.ParkonectError(error)
+            })
+
+        const validatorForm = HTMLParser.parse(response.data).querySelector('form')
+
+        if (!validatorForm)
+            throw new ParkonectErrors.ParkonectError(response, 'Form Not Found')
+
+        // If validation was succesfull, a message should be telling of as such
+        const message = validatorForm.querySelector('#ctl00_cph_body_lbl_message').text
+        const result = message.includes('Record updates successfully!')
+
+        // Grab the next set of state tokens
+        viewstate = validatorForm.querySelector('#__VIEWSTATE').getAttribute('value')
+        eventvalidation = validatorForm.querySelector('#__EVENTVALIDATION').getAttribute('value')
+
+        return {
+            'result': result,
+            'message': message,
+            'viewstate': viewstate,
+            'eventvalidation': eventvalidation,
+            'session_cookie': session_cookie
+        }
     }
 }

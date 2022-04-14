@@ -57,6 +57,7 @@ router.post('/',
                         res.cookie(utils_cookie.getAuthCookieKey(), r.credentials)
                         delete r.credentials
                     }
+                    res.cookie(utils_cookie.getSessionCookieKey(), r.session_cookie)
                     res.render('search', {
                         title_description: 'Search',
                         data: r

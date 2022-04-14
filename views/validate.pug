@@ -1,0 +1,27 @@
+extends base
+
+block content
+    -data = data || {}
+
+    script(
+        src='js/validator.js'
+    )
+
+    if (message)
+        span() #{message}
+
+    form(action="/validate" method="POST" class="form-floating")
+        h1 Parkonect
+
+        input(type="hidden" name="validation_code" id="validation_code" value="")
+        input(type="hidden" name="viewstate" id="viewstate" value=data.viewstate)
+        input(type="hidden" name="eventvalidation" id="eventvalidation" value=data.eventvalidation)
+        input(type="hidden" name="session_cookie" id="session_cookie" value=data.session_cookie)
+
+        div(class="form-floating")
+            select(name="codes" id="codes")
+                each code in data.codes
+                    option(value=code.value) #{code.description}
+
+        div(class="form-floating")
+            input(type="submit" value="Submit" class="btn btn-lg btn-primary btn-block")

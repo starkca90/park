@@ -1,0 +1,23 @@
+extends base
+
+block content
+    -data = data || {}
+
+    form(action="." method="POST" class="form-floating")
+        h1 Parkonect
+
+        p Please enter your Parkonect username and password
+
+        div(class="form-floating")
+            input(type="text" class="form-control" id="username" name="username" placeholder='Username' title='username' value=data.username required="required")
+            label(for="username") Username:
+
+        div(class="form-floating")
+            input(type="password" class="form-control" id="password" name="password" placeholder='Password' title='password' value=data.password required="required")
+            label(for="password") Password:
+
+        input(type="checkbox", class="form-check-input" id="remember" name="remember" title='remember' value=data.remember)
+        lable(class="form-check-label" for="remember") Remember Me?
+
+        div(class="form-floating")
+            input(type="submit" value="Submit" class="btn btn-lg btn-primary btn-block")

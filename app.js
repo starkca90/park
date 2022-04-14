@@ -3,6 +3,7 @@ const cookieParser = require('cookie-parser')
 const logger = require('morgan')
 const {initialize} = require('express-openapi')
 const swaggerUi = require('swagger-ui-express')
+const path = require('path')
 
 const v1ParkonectService = require('./api-v1/services/parkonectService')
 const v1ApiDoc = require('./api-v1/api-doc')
@@ -10,10 +11,18 @@ const v1ApiDoc = require('./api-v1/api-doc')
 const app = express();
 
 app.listen(3030)
+
+app.set('views', path.join(__dirname, 'views'))
+app.set('view engine', 'pug')
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
+
+app.use(express.static('public'))
+app.use('/', require('./routes/routes_root'))
+app.use('/search', require('./routes/routes_search'))
 
 // OpenAPI Routes
 initialize({

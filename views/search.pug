@@ -1,0 +1,37 @@
+extends base
+
+block content
+    -data = data || {}
+
+    canvas
+
+    script(
+        src='js/qrcodelib.js'
+    )
+
+    script(
+        src='js/webcodecamjquery.js'
+    )
+
+    script(
+        src='js/qrcodereader.js'
+    )
+
+    if (message)
+        span(style='color:Red') #{message}
+
+    form(action="/search" method="POST" class="form-floating")
+        h1 Parkonect
+
+        p Please scan/enter your parking ticket
+
+        input(type="hidden" name="viewstate" id="viewstate" value=data.viewstate)
+        input(type="hidden" name="eventvalidation" id="eventvalidation" value=data.eventvalidation)
+        input(type="hidden" name="session_cookie" id="session_cookie" value=data.session_cookie)
+
+        div(class="form-floating")
+            input(type="text" class="form-control" id="ticket" name="ticket" placeholder='Ticket' title='ticket' value=data.ticket required="required")
+            label(for="ticket") Ticket:
+
+        div(class="form-floating")
+            input(type="submit" value="Submit" class="btn btn-lg btn-primary btn-block")

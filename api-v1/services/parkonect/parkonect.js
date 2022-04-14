@@ -6,7 +6,7 @@ const ParkonectErrors = require('./parkonectErrors')
 const utils_cookie = require('../cookie/cookie')
 
 module.exports = {
-    attemptAuth: async function (username, password) {
+    attemptAuth: async function (username, password, remember = false) {
         const jar = new tough.CookieJar()
         const client = wrapper(axios.create({jar}))
 
@@ -71,12 +71,17 @@ module.exports = {
         viewstate = validatorForm.querySelector('#__VIEWSTATE').getAttribute('value')
         eventvalidation = validatorForm.querySelector('#__EVENTVALIDATION').getAttribute('value')
 
-        return {
+        let res = {
             'result': result,
             'viewstate': viewstate,
             'eventvalidation': eventvalidation,
             'session_cookie': sessionCookie
         }
+
+        if (remember)
+            res.credentials = Buffer.from(username + ':' + password).toString('base64')
+
+        return res
     },
 
     ticketSearch: async function (ticket, viewstate, eventvalidation, session_cookie) {
@@ -106,11 +111,19 @@ module.exports = {
                 throw new ParkonectErrors.ParkonectError(error)
             })
 
+        const validatorForm = HTMLParser.parse(response.data).querySelector('form')
+
+        if (!validatorForm)
+            throw new ParkonectErrors.ParkonectError(response, 'Form Not Found')
+
+        // If we found a valid ticket, we shouldn't be asking for a barcode
+        const result = validatorForm.querySelector('#ctl00_cph_body_txt_barcode') === null
+
         // TODO: Need a fresh ticket to see what that response looks like
 
         return {
-            'result': false,
-            'codes': 'Neat',
+            'result': result,
+            'codes': 'TODO',
             'viewstate': viewstate,
             'eventvalidation': eventvalidation,
             'session_cookie': session_cookie

@@ -61,13 +61,14 @@ router.post('/',
                         title_description: 'Search',
                         data: r
                     })
+                } else {
+                    res.render('authentication',
+                        {
+                            title_description: 'Authentication',
+                            errors: 'Username or Password incorrect',
+                            data: req.body
+                        })
                 }
-                res.render('authentication',
-                    {
-                        title_description: 'Authentication',
-                        errors: 'Username or Password incorrect',
-                        data: req.body
-                    })
             }).catch(err => {
                 console.error(err)
                 res.send(err.data.message)

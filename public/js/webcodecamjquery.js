@@ -414,6 +414,8 @@
         return output;
     }
 
+    let device_count = 0
+
     function buildSelectMenu(selectorVideo, ind) {
         videoSelect = $(selectorVideo);
         videoSelect.html('');
@@ -423,6 +425,10 @@
                     devices.forEach(function (device) {
                         gotSources(device);
                     });
+
+                    if (device_count <= 1)
+                        videoSelect.hide()
+
                     if (typeof ind === 'string') {
                         Array.prototype.find.call(videoSelect.get(0).children, function (a, i) {
                             if ($(a).text().toLowerCase().match(new RegExp(ind, 'g'))) {
@@ -451,6 +457,7 @@
             var face = (!device.facing || device.facing === '') ? 'unknown' : device.facing;
             var text = device.label || 'Camera '.concat(videoSelect.children().length + 1, ' (facing: ' + face + ')');
             $('<option value="' + (device.id || device.deviceId) + '">' + text + '</option>').appendTo(videoSelect);
+            device_count++
         }
     }
 

@@ -3,6 +3,13 @@ extends base
 block content
     -data = data || {}
 
+    h1 Parkonect
+
+    if (message)
+        span(style='color:Red') #{message}
+
+    p Please scan/enter your parking ticket
+
     div(id="reader")
 
     script(
@@ -13,14 +20,7 @@ block content
         src='js/qrcodereader.js'
     )
 
-    if (message)
-        span(style='color:Red') #{message}
-
     form(action="/search" method="POST" class="form-floating")
-        h1 Parkonect
-
-        p Please scan/enter your parking ticket
-
         input(type="hidden" name="viewstate" id="viewstate" value=data.viewstate)
         input(type="hidden" name="eventvalidation" id="eventvalidation" value=data.eventvalidation)
         input(type="hidden" name="session_cookie" id="session_cookie" value=data.session_cookie)

@@ -3,15 +3,10 @@ extends base
 block content
     -data = data || {}
 
-    canvas
-    select
+    div(id="reader")
 
     script(
-        src='js/qrcodelib.js'
-    )
-
-    script(
-        src='js/webcodecamjquery.js'
+        src='js/html5-qrcode.min.js'
     )
 
     script(

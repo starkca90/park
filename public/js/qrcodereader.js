@@ -1,17 +1,15 @@
-var arg = {
-    resultFunction: function (result) {
-        $('#ticket').val(result.code);
-        decoder.stop()
-        $('input[type=submit]').click();
-    }
-};
+const html5QrCode = new Html5Qrcode("reader")
 
-var decoder = $("canvas").WebCodeCamJQuery(arg).data().plugin_WebCodeCamJQuery;
-decoder.buildSelectMenu("select");
-decoder.play();
-/*  Without visible select menu
-    decoder.buildSelectMenu(document.createElement('select'), 'environment|back').init(arg).play();
-*/
-$('select').on('change', function () {
-    decoder.stop().play();
+const config = { fps: 10, qrbox: 250 }
+
+html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess).catch(error => {
+  console.log(error)
 });
+
+function onScanSuccess(decodedText, decodedResult) {
+  // Handle on success condition with the decoded text or result.
+  console.log(`Scan result: ${decodedText}`, decodedResult);
+  $('#ticket').val(decodedText)
+  html5QrCode.stop()
+  $('input[type=submit]').click()
+}

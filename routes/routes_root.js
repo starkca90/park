@@ -54,7 +54,7 @@ router.post('/',
                     // Login was a success
                     if (r.credentials) {
                         // User asked to remember them, add a cookie
-                        res.cookie(utils_cookie.getAuthCookieKey(), r.credentials)
+                        res.cookie(utils_cookie.getAuthCookieKey(), r.credentials, {maxAge: 360000})
                         delete r.credentials
                     }
                     res.cookie(utils_cookie.getSessionCookieKey(), r.session_cookie)

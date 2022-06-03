@@ -29,7 +29,7 @@
     "morgan": "^1.10.0",
     "node-html-parser": "^5.3.3",
     "pug": "^3.0.2",
-    "swagger-ui-express": "^4.3.0",
+    "swagger-ui-express": "^4.4.0",
     "tough-cookie": "^4.0.0"
   }
 }

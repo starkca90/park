@@ -135,8 +135,15 @@ module.exports = {
         // From testing, this parameter is always empty, but if it is not included, the server breaks
         body.append('__VIEWSTATEENCRYPTED', null)
         body.append('__EVENTVALIDATION', eventvalidation)
-        body.append('ctl00$cph_body$txt_barcode', ticket)
+        // Parkonect renamed the barcode field to txt_filter... Neat
+        body.append('ctl00$cph_body$txt_filter', ticket)
+
+        // Parkonect now has the ability to search by various types (Last name, license plate...) 
+        // 1 Indicate barcode, what we have
+        body.append('ctl00$cph_body$ddlFilterList', '1')
         body.append('ctl00$cph_body$btn_search', 'Submit')
+
+        
 
         let response = await client.post('https://secure.parkonect.com/ValidatorStep2.aspx', body,
             {

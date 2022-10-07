@@ -102,11 +102,11 @@ module.exports = {
 
         // If we authenticated, the form will be asking for a barcode. If that input is present,
         // authentication worked
-        const result = validatorForm.querySelector('#ctl00_cph_body_txt_barcode') !== null
+        const result = validatorForm.getElementById("ctl00_cph_body_ddlFilterList") !== null
 
         // Grab the next set of state tokens
-        viewstate = validatorForm.querySelector('#__VIEWSTATE').getAttribute('value')
-        eventvalidation = validatorForm.querySelector('#__EVENTVALIDATION').getAttribute('value')
+        viewstate = validatorForm.getElementById('__VIEWSTATE').getAttribute('value')
+        eventvalidation = validatorForm.getElementById('__EVENTVALIDATION').getAttribute('value')
 
         let res = {
             'result': result,

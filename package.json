@@ -19,7 +19,7 @@
   "homepage": "https://github.com/starkca90/park#readme",
   "dependencies": {
     "axios": "^0.26.1",
-    "axios-cookiejar-support": "^2.0.4",
+    "axios-cookiejar-support": "^2.0.5",
     "cookie-parser": "^1.4.6",
     "debug": "^4.3.4",
     "dotenv-defaults": "^5.0.0",

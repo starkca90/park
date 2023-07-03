@@ -31,6 +31,6 @@
     "node-html-parser": "^6.1.5",
     "pug": "^3.0.2",
     "swagger-ui-express": "^4.6.2",
-    "tough-cookie": "^4.1.2"
+    "tough-cookie": "^4.1.3"
   }
 }
